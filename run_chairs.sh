@@ -1,0 +1,12 @@
+python test.py --dataroot ../ShapeNetCore.v2.PC15k/ --category chair --model_type 'DiT-S/4' --voxel_size 32 --model ./s4_chair/checkpoint.pth --time_num 1 --saving_folder chair_outputs --use_ddim
+python test.py --dataroot ../ShapeNetCore.v2.PC15k/ --category chair --model_type 'DiT-S/4' --voxel_size 32 --model ./s4_chair/checkpoint.pth --time_num 20 --saving_folder chair_outputs --use_ddim
+python test.py --dataroot ../ShapeNetCore.v2.PC15k/ --category chair --model_type 'DiT-S/4' --voxel_size 32 --model ./s4_chair/checkpoint.pth --time_num 50 --saving_folder chair_outputs --use_ddim
+python test.py --dataroot ../ShapeNetCore.v2.PC15k/ --category chair --model_type 'DiT-S/4' --voxel_size 32 --model ./s4_chair/checkpoint.pth --time_num 100 --saving_folder chair_outputs --use_ddim
+python test.py --dataroot ../ShapeNetCore.v2.PC15k/ --category chair --model_type 'DiT-S/4' --voxel_size 32 --model ./s4_chair/checkpoint.pth --time_num 500 --saving_folder chair_outputs --use_ddim
+python test.py --dataroot ../ShapeNetCore.v2.PC15k/ --category chair --model_type 'DiT-S/4' --voxel_size 32 --model ./s4_chair/checkpoint.pth --time_num 1000 --saving_folder chair_outputs --use_ddim
+python test.py --dataroot ../ShapeNetCore.v2.PC15k/ --category chair --model_type 'DiT-S/4' --voxel_size 32 --model ./s4_chair/checkpoint.pth --time_num 1 --saving_folder chair_outputs
+python test.py --dataroot ../ShapeNetCore.v2.PC15k/ --category chair --model_type 'DiT-S/4' --voxel_size 32 --model ./s4_chair/checkpoint.pth --time_num 20 --saving_folder chair_outputs
+python test.py --dataroot ../ShapeNetCore.v2.PC15k/ --category chair --model_type 'DiT-S/4' --voxel_size 32 --model ./s4_chair/checkpoint.pth --time_num 50 --saving_folder chair_outputs
+python test.py --dataroot ../ShapeNetCore.v2.PC15k/ --category chair --model_type 'DiT-S/4' --voxel_size 32 --model ./s4_chair/checkpoint.pth --time_num 100 --saving_folder chair_outputs
+python test.py --dataroot ../ShapeNetCore.v2.PC15k/ --category chair --model_type 'DiT-S/4' --voxel_size 32 --model ./s4_chair/checkpoint.pth --time_num 500 --saving_folder chair_outputs
+python test.py --dataroot ../ShapeNetCore.v2.PC15k/ --category chair --model_type 'DiT-S/4' --voxel_size 32 --model ./s4_chair/checkpoint.pth --time_num 1000 --saving_folder chair_outputs
