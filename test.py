@@ -258,10 +258,55 @@ class GaussianDiffusion:
             - pred_xstart
         ) / self._extract(self.sqrt_recipm1_alphas_cumprod.to(x_t.device), t, x_t.shape)
 
+    def ddim_sample(
+            self,
+            model,
+            x,
+            y,
+            t,
+            clip_denoised=True,
+            denoised_fn=None,
+            eta=0.0,
+    ):
+        """
+        Sample x_{t-1} from the model using DDIM.
+        Same usage as p_sample().
+        """
+        model_mean, model_variance, model_log_variance, x_recon = self.p_mean_variance(
+            model,
+            x,
+            t,
+            y=y,
+            clip_denoised=clip_denoised,
+            return_pred_xstart=True,
+        )
+        # Usually our model outputs epsilon, but we re-derive it
+        # in case we used x_start or x_prev prediction.
+        eps = self._predict_eps_from_xstart(x, t, x_recon)
+        alpha_bar = self._extract(self.alphas_cumprod.to(t.device), t, x.shape)
+        alpha_bar_prev = self._extract(self.alphas_cumprod_prev.to(t.device), t, x.shape)
+        sigma = (
+                eta
+                * torch.sqrt((1 - alpha_bar_prev) / (1 - alpha_bar))
+                * torch.sqrt(1 - alpha_bar / alpha_bar_prev)
+        )
+        # Equation 12.
+        noise = torch.randn_like(x)
+        mean_pred = (
+                x_recon * torch.sqrt(alpha_bar_prev)
+                + torch.sqrt(1 - alpha_bar_prev - sigma ** 2) * eps
+        )
+        nonzero_mask = (
+            (t != 0).float().view(-1, *([1] * (len(x.shape) - 1)))
+        )  # no noise when t == 0
+        sample = mean_pred + nonzero_mask * sigma * noise
+        return {"sample": sample, "pred_xstart": x_recon}
+
     def ddim_sample_loop(
         self,
         model,
         shape,
+        y,
         noise=None,
         clip_denoised=False,
         denoised_fn=None,
@@ -277,6 +322,7 @@ class GaussianDiffusion:
         for sample in self.ddim_sample_loop_progressive(
             model,
             shape,
+            y,
             noise=noise,
             clip_denoised=clip_denoised,
             denoised_fn=denoised_fn,
@@ -291,6 +337,7 @@ class GaussianDiffusion:
             self,
             model,
             shape,
+            y,
             noise=None,
             clip_denoised=False,
             denoised_fn=None,
@@ -326,6 +373,7 @@ class GaussianDiffusion:
                 out = self.ddim_sample(
                     model,
                     img,
+                    y,
                     t,
                     clip_denoised=clip_denoised,
                     denoised_fn=denoised_fn,
@@ -482,10 +530,10 @@ class Model(nn.Module):
                     clip_denoised=True,
                     keep_running=False):
         if opt.use_ddim:
-            return self.diffusion.ddim_sample_loop(self._denoise, shape=shape, device=device, noise=None,
+            return self.diffusion.ddim_sample_loop(self._denoise, shape=shape, device=device, y=y, noise=None,
                                                    clip_denoised=clip_denoised, progress=True)
         else:
-            return self.diffusion.p_sample_loop(self._denoise, shape=shape, device=device, noise_fn=noise_fn,
+            return self.diffusion.p_sample_loop(self._denoise, shape=shape, device=device, y=y, noise_fn=noise_fn,
                                             clip_denoised=clip_denoised,
                                             keep_running=keep_running)
 
@@ -625,8 +673,9 @@ def generate(model, opt):
             x = data['test_points'].transpose(1,2)
             m, s = data['mean'].float(), data['std'].float()
 
+            y = data['cate_idx']
             gen = model.gen_samples(x.shape,
-                                       'cuda', None, clip_denoised=False).detach().cpu()
+                                       'cuda', new_y_chain('cuda', y.shape[0], opt.num_classes), clip_denoised=False).detach().cpu()
 
             gen = gen.transpose(1,2).contiguous()
             x = x.transpose(1,2).contiguous()
