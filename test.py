@@ -626,7 +626,7 @@ def generate(model, opt):
             m, s = data['mean'].float(), data['std'].float()
 
             gen = model.gen_samples(x.shape,
-                                       'cuda', clip_denoised=False).detach().cpu()
+                                       'cuda', None, clip_denoised=False).detach().cpu()
 
             gen = gen.transpose(1,2).contiguous()
             x = x.transpose(1,2).contiguous()
