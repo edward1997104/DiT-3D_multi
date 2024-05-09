@@ -663,6 +663,9 @@ def generate(model, opt):
     test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=opt.batch_size,
                                                   shuffle=False, num_workers=int(opt.workers), drop_last=False)
 
+    def new_y_chain(device, num_chain, num_classes):
+        return torch.randint(low=0,high=num_classes,size=(num_chain,),device=device)
+
     with torch.no_grad():
 
         samples = []
