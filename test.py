@@ -802,6 +802,7 @@ def parse_args():
     parser.add_argument('--beta_end', default=0.02)
     parser.add_argument('--schedule_type', default='linear')
     parser.add_argument('--time_num', type=int,default=1000)
+    parser.add_argument('--saving_folder', default='./gt')
 
     #params
     parser.add_argument('--attention', default=True)
