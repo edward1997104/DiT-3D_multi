@@ -17,6 +17,7 @@ from tqdm import tqdm
 from datasets.shapenet_data_pc import ShapeNet15kPointClouds
 
 from models.dit3d import DiT3D_models
+from models.dit3d_window_attn import DiT3D_models_WindAttn
 
 
 def space_timesteps(num_timesteps, section_counts):
@@ -487,7 +488,15 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.diffusion = SpacedDiffusion(betas=betas, loss_type=loss_type, model_mean_type=model_mean_type, model_var_type=model_var_type, use_timesteps= space_timesteps(1000, [opt.time_num]))
         # DiT-3d
-        self.model = DiT3D_models[args.model_type](input_size=args.voxel_size, num_classes=args.num_classes)
+        if args.window_size > 0:
+            self.model = DiT3D_models_WindAttn[args.model_type](pretrained=args.use_pretrained,
+                                                   input_size=args.voxel_size,
+                                                   window_size=args.window_size,
+                                                   window_block_indexes=args.window_block_indexes,
+                                                   num_classes=args.num_classes
+                                                )
+        else:
+            self.model = DiT3D_models[args.model_type](input_size=args.voxel_size, num_classes=args.num_classes)
 
 
     def prior_kl(self, x0):
@@ -795,6 +804,8 @@ def parse_args():
 
     parser.add_argument('--nc', default=3)
     parser.add_argument('--npoints', default=2048)
+    parser.add_argument('--window_size', type=int, default=0)
+    parser.add_argument('--window_block_indexes', type=tuple, default='0,3,6,9')
     parser.add_argument("--voxel_size", type=int, choices=[16, 32, 64], default=32)
     '''model'''
     parser.add_argument("--model_type", type=str, choices=list(DiT3D_models.keys()), default="DiT-XL/2")
