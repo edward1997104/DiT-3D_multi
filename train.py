@@ -426,6 +426,7 @@ class Model(nn.Module):
                                                     )
 
 
+
     def prior_kl(self, x0):
         return self.diffusion._prior_bpd(x0)
 
