@@ -814,6 +814,7 @@ def parse_args():
     parser.add_argument('--schedule_type', default='linear')
     parser.add_argument('--time_num', type=int,default=1000)
     parser.add_argument('--saving_folder', default='./gt')
+    parser.add_argument('--use_pretrained', default=False)
 
     #params
     parser.add_argument('--attention', default=True)
